@@ -1,1 +1,12 @@
+<header class="topbar">
+	<nav class="nav">
+		<a routerLink="/photos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+			Photos
+		</a>
+		<a routerLink="/photos/new" routerLinkActive="active">
+			New Photo
+		</a>
+	</nav>
+</header>
+
 <router-outlet />

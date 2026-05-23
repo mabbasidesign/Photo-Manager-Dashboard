@@ -14,6 +14,10 @@ export class PhotoApiService {
     return this.http.get<PhotoItem[]>(this.apiUrl, { params });
   }
 
+  getPhotoById(id: number): Observable<PhotoItem> {
+    return this.http.get<PhotoItem>(`${this.apiUrl}/${id}`);
+  }
+
   createPhoto(payload: PhotoPayload): Observable<PhotoItem> {
     return this.http.post<PhotoItem>(this.apiUrl, payload);
   }

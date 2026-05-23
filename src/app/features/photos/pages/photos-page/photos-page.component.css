@@ -26,6 +26,13 @@
   margin-bottom: 1rem;
 }
 
+.hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
 .hero h1 {
   margin: 0;
   font-size: clamp(1.5rem, 2vw + 1rem, 2.5rem);
@@ -34,6 +41,21 @@
 .hero p {
   margin-top: 0.5rem;
   color: #4b5563;
+}
+
+.new-button {
+  text-decoration: none;
+  color: #ffffff;
+  background: linear-gradient(120deg, #0f766e, #0369a1);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+}
+
+.mode-hint {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: #0f766e;
 }
 
 .feedback {

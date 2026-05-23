@@ -1,0 +1,68 @@
+Angular Practice Roadmap
+
+1. Reactive Forms + Validation
+- Replace template-driven form (ngModel) with FormGroup.
+- Add validators (required, minLength, pattern) and custom URL validator.
+- Show field-level error messages and disable submit when invalid.
+
+2. Route Structure + Lazy Loading
+- Create routes like /photos, /photos/new, /photos/:id/edit.
+- Lazy-load the photos feature using loadComponent or loadChildren.
+- Add a nav bar with active link styles.
+
+3. Route Guards + Unsaved Changes
+- Add CanDeactivate guard for create/edit form.
+- Prompt before leaving dirty forms.
+
+4. HTTP Interceptor
+- Add global loading spinner support.
+- Add centralized error mapping/handling.
+- Optionally attach a mock auth header.
+
+5. State Management
+- Start with a facade service using RxJS (BehaviorSubject, combineLatest).
+- Optional next step: NgRx signal store or classic NgRx.
+
+6. Search, Sort, Pagination
+- Filter photos by title.
+- Sort (A-Z, Z-A, newest ID).
+- Add pagination and keep state in query params.
+
+7. Reusable Shared UI Components
+- Build shared Button, Card, Input, EmptyState, ConfirmDialog components.
+- Practice content projection (ng-content) and inputs/outputs.
+
+8. Unit Tests
+- Test components, service, and facade logic.
+- Mock HTTP with HttpTestingController.
+- Test validation and interaction flows.
+
+9. E2E Tests
+- Add Playwright or Cypress.
+- Cover CRUD happy path and validation errors.
+
+10. Signals (Modern Angular)
+- Convert local state to signal, computed, and effect.
+- Compare approach with RxJS.
+
+11. Dynamic Forms
+- Build forms from config metadata.
+- Practice structural directives and dynamic rendering.
+
+12. Accessibility + UX
+- Improve labels, focus states, and ARIA attributes.
+- Add snackbar notifications.
+- Use skeleton loaders.
+
+13. Performance Optimization
+- Use trackBy in loops.
+- Split heavy UI into smaller components.
+- Analyze with Angular DevTools.
+
+14. Environment Config + Deployment
+- Add environment-specific API URLs.
+- Deploy to Netlify, Vercel, or Azure Static Web Apps.
+
+15. Authentication Mock Flow
+- Add login, protected routes, and token simulation.
+- Practice guards and interceptor integration.

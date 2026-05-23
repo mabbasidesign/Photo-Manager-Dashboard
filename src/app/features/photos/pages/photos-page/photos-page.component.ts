@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PhotoApiService } from '../../../../core/services/photo-api.service';
 import { PhotoItem, PhotoPayload } from '../../../../core/models/photo.model';
 import { PhotoFormComponent } from '../../components/photo-form/photo-form.component';
@@ -7,12 +8,13 @@ import { PhotoListComponent } from '../../components/photo-list/photo-list.compo
 
 @Component({
   selector: 'app-photos-page',
-  imports: [CommonModule, PhotoFormComponent, PhotoListComponent],
+  imports: [CommonModule, RouterLink, PhotoFormComponent, PhotoListComponent],
   templateUrl: './photos-page.component.html',
   styleUrl: './photos-page.component.css'
 })
 export class PhotosPageComponent implements OnInit {
   readonly title = 'Photo Manager Dashboard';
+  mode: 'list' | 'create' | 'edit' = 'list';
   photos: PhotoItem[] = [];
   loading = false;
   saving = false;
@@ -26,9 +28,23 @@ export class PhotosPageComponent implements OnInit {
     thumbnailUrl: ''
   };
 
-  constructor(private readonly photoApiService: PhotoApiService) {}
+  constructor(
+    private readonly photoApiService: PhotoApiService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
+    this.route.data.subscribe((data) => {
+      this.mode = data['mode'] ?? 'list';
+      this.applyModeDefaults();
+      this.tryLoadEditRouteData();
+    });
+
+    this.route.paramMap.subscribe(() => {
+      this.tryLoadEditRouteData();
+    });
+
     this.loadPhotos();
   }
 
@@ -49,19 +65,11 @@ export class PhotosPageComponent implements OnInit {
   }
 
   editPhoto(photo: PhotoItem): void {
-    this.editingPhotoId = photo.id;
-    this.form = {
-      title: photo.title,
-      url: photo.url,
-      thumbnailUrl: photo.thumbnailUrl
-    };
-    this.feedback = `Editing image #${photo.id}`;
+    void this.router.navigate(['/photos', photo.id, 'edit']);
   }
 
   cancelEdit(): void {
-    this.editingPhotoId = null;
-    this.resetForm();
-    this.feedback = 'Edit canceled.';
+    void this.router.navigate(['/photos']);
   }
 
   submitForm(): void {
@@ -105,6 +113,7 @@ export class PhotosPageComponent implements OnInit {
         this.saving = false;
         this.feedback = `Created image #${created.id}.`;
         this.resetForm();
+        void this.router.navigate(['/photos']);
       },
       error: () => {
         this.saving = false;
@@ -123,6 +132,7 @@ export class PhotosPageComponent implements OnInit {
         this.feedback = `Updated image #${id}.`;
         this.editingPhotoId = null;
         this.resetForm();
+        void this.router.navigate(['/photos']);
       },
       error: () => {
         this.saving = false;
@@ -137,5 +147,57 @@ export class PhotosPageComponent implements OnInit {
       url: '',
       thumbnailUrl: ''
     };
+  }
+
+  private applyModeDefaults(): void {
+    if (this.mode === 'create') {
+      this.editingPhotoId = null;
+      this.resetForm();
+      this.feedback = 'Create mode';
+      return;
+    }
+
+    if (this.mode === 'list') {
+      this.editingPhotoId = null;
+      this.resetForm();
+    }
+  }
+
+  private tryLoadEditRouteData(): void {
+    if (this.mode !== 'edit') {
+      return;
+    }
+
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (Number.isNaN(id)) {
+      this.feedback = 'Invalid image id for edit route.';
+      return;
+    }
+
+    this.editingPhotoId = id;
+    const localPhoto = this.photos.find((item) => item.id === id);
+    if (localPhoto) {
+      this.form = {
+        title: localPhoto.title,
+        url: localPhoto.url,
+        thumbnailUrl: localPhoto.thumbnailUrl
+      };
+      this.feedback = `Editing image #${id}`;
+      return;
+    }
+
+    this.photoApiService.getPhotoById(id).subscribe({
+      next: (photo) => {
+        this.form = {
+          title: photo.title,
+          url: photo.url,
+          thumbnailUrl: photo.thumbnailUrl
+        };
+        this.feedback = `Editing image #${id}`;
+      },
+      error: () => {
+        this.feedback = `Unable to load image #${id} for editing.`;
+      }
+    });
   }
 }

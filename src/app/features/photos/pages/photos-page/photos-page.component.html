@@ -1,10 +1,15 @@
 <main class="page">
   <header class="hero">
-    <h1>{{ title }}</h1>
+    <div class="hero-row">
+      <h1>{{ title }}</h1>
+      <a class="new-button" routerLink="/photos/new">+ Add New</a>
+    </div>
     <p>
       Practice CRUD operations with JSONPlaceholder photos API.
       Requests are successful but data is not permanently stored by the test API.
     </p>
+    <p class="mode-hint" *ngIf="mode === 'create'">Route mode: /photos/new</p>
+    <p class="mode-hint" *ngIf="mode === 'edit'">Route mode: /photos/:id/edit</p>
   </header>
 
   <app-photo-form
