@@ -33,8 +33,19 @@
     </label>
 
     <div class="actions">
-      <button type="submit" [disabled]="saving">
-        {{ saving ? 'Saving...' : editingPhotoId ? 'Update' : 'Create' }}
+      <button
+        type="submit"
+        [disabled]="saving"
+        [class.submit-update]="editingPhotoId !== null"
+        [class.submit-create]="editingPhotoId === null"
+      >
+        {{
+          saving
+            ? 'Saving...'
+            : editingPhotoId
+              ? 'Update Photo'
+              : 'Create Photo'
+        }}
       </button>
 
       <button

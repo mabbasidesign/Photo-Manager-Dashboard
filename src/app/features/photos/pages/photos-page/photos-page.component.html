@@ -25,12 +25,50 @@
       (refreshPressed)="loadPhotos()"
     />
 
-    <app-photo-list
-      [photos]="photos"
-      [loading]="loading"
-      [deletingId]="deletingId"
-      (editPressed)="editPhoto($event)"
-      (deletePressed)="deletePhoto($event)"
-    />
+    <section class="list-side">
+      <div class="list-controls">
+        <label class="control-field">
+          Search
+          <input
+            type="text"
+            [value]="searchTerm"
+            placeholder="Search by title"
+            (input)="onSearchInput($event)"
+          />
+        </label>
+
+        <label class="control-field">
+          Sort
+          <select [value]="sortBy" (change)="onSortChange($event)">
+            <option value="idDesc">Newest first</option>
+            <option value="idAsc">Oldest first</option>
+            <option value="titleAsc">Title A-Z</option>
+            <option value="titleDesc">Title Z-A</option>
+          </select>
+        </label>
+
+        <div class="results-meta">
+          <strong>{{ totalItems }}</strong> results
+        </div>
+      </div>
+
+      <app-photo-list
+        [photos]="pagedPhotos"
+        [loading]="loading"
+        [deletingId]="deletingId"
+        (editPressed)="editPhoto($event)"
+        (deletePressed)="deletePhoto($event)"
+      />
+
+      <div class="pagination" *ngIf="!loading && totalPages > 1">
+        <button type="button" (click)="goToPreviousPage()" [disabled]="currentPage <= 1">
+          Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button type="button" (click)="goToNextPage()" [disabled]="currentPage >= totalPages">
+          Next
+        </button>
+      </div>
+    </section>
   </section>
 </main>

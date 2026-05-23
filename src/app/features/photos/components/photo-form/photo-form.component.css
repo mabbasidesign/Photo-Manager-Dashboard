@@ -70,6 +70,14 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button.submit-create {
+  background: linear-gradient(120deg, #0ea5a4, #2563eb);
+}
+
+button.submit-update {
+  background: linear-gradient(120deg, #f59e0b, #ea580c);
+}
+
 button:disabled {
   opacity: 0.7;
   cursor: not-allowed;

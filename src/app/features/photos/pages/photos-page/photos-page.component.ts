@@ -1,15 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PhotoItem, PhotoPayload } from '../../../../core/models/photo.model';
 import { PhotoFormComponent } from '../../components/photo-form/photo-form.component';
 import { PhotoListComponent } from '../../components/photo-list/photo-list.component';
 import { PhotosFacadeService } from '../../data/photos-facade.service';
 import { Subscription } from 'rxjs';
 
+type SortOption = 'idDesc' | 'idAsc' | 'titleAsc' | 'titleDesc';
+
 @Component({
   selector: 'app-photos-page',
-  imports: [CommonModule, RouterLink, PhotoFormComponent, PhotoListComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PhotoFormComponent, PhotoListComponent],
   templateUrl: './photos-page.component.html',
   styleUrl: './photos-page.component.css'
 })
@@ -17,10 +20,19 @@ export class PhotosPageComponent implements OnInit {
   readonly title = 'Photo Manager Dashboard';
   mode: 'list' | 'create' | 'edit' = 'list';
   photos: PhotoItem[] = [];
+  filteredPhotos: PhotoItem[] = [];
+  pagedPhotos: PhotoItem[] = [];
   loading = false;
   saving = false;
   deletingId: number | null = null;
   feedback = '';
+
+  searchTerm = '';
+  sortBy: SortOption = 'idDesc';
+  currentPage = 1;
+  readonly pageSize = 8;
+  totalPages = 1;
+  totalItems = 0;
 
   editingPhotoId: number | null = null;
   form: PhotoPayload = {
@@ -49,6 +61,16 @@ export class PhotosPageComponent implements OnInit {
         this.saving = vm.saving;
         this.deletingId = vm.deletingId;
         this.feedback = vm.feedback;
+        this.recomputeListView();
+      })
+    );
+
+    this.subscriptions.add(
+      this.route.queryParamMap.subscribe((queryParams) => {
+        this.searchTerm = queryParams.get('q') ?? '';
+        this.sortBy = this.parseSortOption(queryParams.get('sort'));
+        this.currentPage = this.parsePage(queryParams.get('page'));
+        this.recomputeListView();
       })
     );
 
@@ -110,6 +132,42 @@ export class PhotosPageComponent implements OnInit {
 
   deletePhoto(photo: PhotoItem): void {
     this.photosFacade.deletePhoto(photo);
+  }
+
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    this.searchTerm = target?.value ?? '';
+    this.currentPage = 1;
+    this.updateQueryParams();
+    this.recomputeListView();
+  }
+
+  onSortChange(event: Event): void {
+    const target = event.target as HTMLSelectElement | null;
+    this.sortBy = this.parseSortOption(target?.value ?? 'idDesc');
+    this.currentPage = 1;
+    this.updateQueryParams();
+    this.recomputeListView();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage <= 1) {
+      return;
+    }
+
+    this.currentPage -= 1;
+    this.updateQueryParams();
+    this.recomputeListView();
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage >= this.totalPages) {
+      return;
+    }
+
+    this.currentPage += 1;
+    this.updateQueryParams();
+    this.recomputeListView();
   }
 
   private createPhoto(): void {
@@ -217,5 +275,69 @@ export class PhotosPageComponent implements OnInit {
     } catch {
       return false;
     }
+  }
+
+  private recomputeListView(): void {
+    const query = this.searchTerm.trim().toLowerCase();
+    let working = [...this.photos];
+
+    if (query) {
+      working = working.filter((photo) =>
+        photo.title.toLowerCase().includes(query)
+      );
+    }
+
+    working.sort((a, b) => this.comparePhotos(a, b, this.sortBy));
+
+    this.filteredPhotos = working;
+    this.totalItems = working.length;
+    this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+    this.currentPage = Math.min(this.currentPage, this.totalPages);
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedPhotos = working.slice(start, start + this.pageSize);
+  }
+
+  private comparePhotos(a: PhotoItem, b: PhotoItem, sortBy: SortOption): number {
+    switch (sortBy) {
+      case 'idAsc':
+        return a.id - b.id;
+      case 'titleAsc':
+        return a.title.localeCompare(b.title);
+      case 'titleDesc':
+        return b.title.localeCompare(a.title);
+      case 'idDesc':
+      default:
+        return b.id - a.id;
+    }
+  }
+
+  private parseSortOption(value: string | null): SortOption {
+    if (value === 'idAsc' || value === 'titleAsc' || value === 'titleDesc') {
+      return value;
+    }
+
+    return 'idDesc';
+  }
+
+  private parsePage(value: string | null): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < 1) {
+      return 1;
+    }
+
+    return Math.floor(parsed);
+  }
+
+  private updateQueryParams(): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      replaceUrl: true,
+      queryParams: {
+        q: this.searchTerm || null,
+        sort: this.sortBy === 'idDesc' ? null : this.sortBy,
+        page: this.currentPage === 1 ? null : this.currentPage
+      }
+    });
   }
 }
