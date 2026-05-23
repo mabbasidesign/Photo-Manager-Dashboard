@@ -7,6 +7,15 @@
 			New Photo
 		</a>
 	</nav>
+
+	<div class="loading-bar" *ngIf="isLoading()">
+		<div class="loading-fill"></div>
+	</div>
 </header>
+
+<section class="global-error" *ngIf="errorMessage()">
+	<p>{{ errorMessage() }}</p>
+	<button type="button" (click)="clearGlobalError()">Dismiss</button>
+</section>
 
 <router-outlet />
