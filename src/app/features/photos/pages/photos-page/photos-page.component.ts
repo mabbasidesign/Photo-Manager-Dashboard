@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { PhotoApiService } from '../../../../core/services/photo-api.service';
 import { PhotoItem, PhotoPayload } from '../../../../core/models/photo.model';
 import { PhotoFormComponent } from '../../components/photo-form/photo-form.component';
 import { PhotoListComponent } from '../../components/photo-list/photo-list.component';
+import { PhotosFacadeService } from '../../data/photos-facade.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-photos-page',
@@ -32,14 +33,25 @@ export class PhotosPageComponent implements OnInit {
     url: '',
     thumbnailUrl: ''
   };
+  private readonly subscriptions = new Subscription();
 
   constructor(
-    private readonly photoApiService: PhotoApiService,
+    private readonly photosFacade: PhotosFacadeService,
     private readonly route: ActivatedRoute,
     private readonly router: Router
   ) {}
 
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.photosFacade.vm$.subscribe((vm) => {
+        this.photos = vm.photos;
+        this.loading = vm.loading;
+        this.saving = vm.saving;
+        this.deletingId = vm.deletingId;
+        this.feedback = vm.feedback;
+      })
+    );
+
     this.route.data.subscribe((data) => {
       this.mode = data['mode'] ?? 'list';
       this.applyModeDefaults();
@@ -53,20 +65,12 @@ export class PhotosPageComponent implements OnInit {
     this.loadPhotos();
   }
 
-  loadPhotos(): void {
-    this.loading = true;
-    this.feedback = '';
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 
-    this.photoApiService.getPhotos(12).subscribe({
-      next: (items) => {
-        this.photos = items;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.feedback = 'Failed to load images from the API.';
-      }
-    });
+  loadPhotos(): void {
+    this.photosFacade.loadPhotos(12);
   }
 
   editPhoto(photo: PhotoItem): void {
@@ -87,17 +91,14 @@ export class PhotosPageComponent implements OnInit {
 
   submitForm(): void {
     if (!this.form.title || !this.form.url || !this.form.thumbnailUrl) {
-      this.feedback = 'Please fill all fields.';
+      this.photosFacade.setFeedback('Please fill all fields.');
       return;
     }
 
     if (!this.isValidUrl(this.form.url) || !this.isValidUrl(this.form.thumbnailUrl)) {
-      this.feedback = 'Please enter valid URLs for Image URL and Thumbnail URL.';
+      this.photosFacade.setFeedback('Please enter valid URLs for Image URL and Thumbnail URL.');
       return;
     }
-
-    this.saving = true;
-    this.feedback = '';
 
     if (this.editingPhotoId === null) {
       this.createPhoto();
@@ -108,53 +109,24 @@ export class PhotosPageComponent implements OnInit {
   }
 
   deletePhoto(photo: PhotoItem): void {
-    this.deletingId = photo.id;
-    this.feedback = '';
-
-    this.photoApiService.deletePhoto(photo.id).subscribe({
-      next: () => {
-        this.photos = this.photos.filter((item) => item.id !== photo.id);
-        this.deletingId = null;
-        this.feedback = `Deleted image #${photo.id}.`;
-      },
-      error: () => {
-        this.deletingId = null;
-        this.feedback = 'Delete failed.';
-      }
-    });
+    this.photosFacade.deletePhoto(photo);
   }
 
   private createPhoto(): void {
-    this.photoApiService.createPhoto(this.form).subscribe({
-      next: (created) => {
-        this.photos = [created, ...this.photos];
-        this.saving = false;
-        this.feedback = `Created image #${created.id}.`;
+    this.photosFacade.createPhoto(this.form).subscribe((succeeded) => {
+      if (succeeded) {
         this.resetForm();
         void this.router.navigate(['/photos']);
-      },
-      error: () => {
-        this.saving = false;
-        this.feedback = 'Create failed.';
       }
     });
   }
 
   private updatePhoto(id: number): void {
-    this.photoApiService.updatePhoto(id, this.form).subscribe({
-      next: (updated) => {
-        this.photos = this.photos.map((item) =>
-          item.id === id ? { ...item, ...updated } : item
-        );
-        this.saving = false;
-        this.feedback = `Updated image #${id}.`;
+    this.photosFacade.updatePhoto(id, this.form).subscribe((succeeded) => {
+      if (succeeded) {
         this.editingPhotoId = null;
         this.resetForm();
         void this.router.navigate(['/photos']);
-      },
-      error: () => {
-        this.saving = false;
-        this.feedback = 'Update failed.';
       }
     });
   }
@@ -172,7 +144,7 @@ export class PhotosPageComponent implements OnInit {
     if (this.mode === 'create') {
       this.editingPhotoId = null;
       this.resetForm();
-      this.feedback = 'Create mode';
+      this.photosFacade.setFeedback('Create mode');
       return;
     }
 
@@ -189,12 +161,12 @@ export class PhotosPageComponent implements OnInit {
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (Number.isNaN(id)) {
-      this.feedback = 'Invalid image id for edit route.';
+      this.photosFacade.setFeedback('Invalid image id for edit route.');
       return;
     }
 
     this.editingPhotoId = id;
-    const localPhoto = this.photos.find((item) => item.id === id);
+    const localPhoto = this.photosFacade.findLocalPhotoById(id);
     if (localPhoto) {
       this.form = {
         title: localPhoto.title,
@@ -202,11 +174,11 @@ export class PhotosPageComponent implements OnInit {
         thumbnailUrl: localPhoto.thumbnailUrl
       };
       this.initialFormSnapshot = { ...this.form };
-      this.feedback = `Editing image #${id}`;
+      this.photosFacade.setFeedback(`Editing image #${id}`);
       return;
     }
 
-    this.photoApiService.getPhotoById(id).subscribe({
+    this.photosFacade.getPhotoById(id).subscribe({
       next: (photo) => {
         this.form = {
           title: photo.title,
@@ -214,10 +186,10 @@ export class PhotosPageComponent implements OnInit {
           thumbnailUrl: photo.thumbnailUrl
         };
         this.initialFormSnapshot = { ...this.form };
-        this.feedback = `Editing image #${id}`;
+        this.photosFacade.setFeedback(`Editing image #${id}`);
       },
       error: () => {
-        this.feedback = `Unable to load image #${id} for editing.`;
+        this.photosFacade.setFeedback(`Unable to load image #${id} for editing.`);
       }
     });
   }
