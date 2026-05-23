@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PhotoPayload } from '../../../../core/models/photo.model';
@@ -7,7 +7,8 @@ import { PhotoPayload } from '../../../../core/models/photo.model';
   selector: 'app-photo-form',
   imports: [CommonModule, FormsModule],
   templateUrl: './photo-form.component.html',
-  styleUrl: './photo-form.component.css'
+  styleUrl: './photo-form.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhotoFormComponent {
   @Input({ required: true }) form!: PhotoPayload;

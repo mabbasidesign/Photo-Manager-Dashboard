@@ -4,7 +4,7 @@
   <p *ngIf="loading" class="muted">Loading images...</p>
 
   <div class="image-grid" *ngIf="!loading">
-    <article class="image-card" *ngFor="let photo of photos">
+    <article class="image-card" *ngFor="let photo of photos; trackBy: trackByPhotoId">
       <img
         [src]="getImageUrl(photo)"
         [alt]="photo.title"

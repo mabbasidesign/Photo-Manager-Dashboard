@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PhotoItem } from '../../../../core/models/photo.model';
 
@@ -6,7 +6,8 @@ import { PhotoItem } from '../../../../core/models/photo.model';
   selector: 'app-photo-list',
   imports: [CommonModule],
   templateUrl: './photo-list.component.html',
-  styleUrl: './photo-list.component.css'
+  styleUrl: './photo-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhotoListComponent {
   @Input({ required: true }) photos: PhotoItem[] = [];
@@ -15,6 +16,10 @@ export class PhotoListComponent {
 
   @Output() editPressed = new EventEmitter<PhotoItem>();
   @Output() deletePressed = new EventEmitter<PhotoItem>();
+
+  trackByPhotoId(_: number, photo: PhotoItem): number {
+    return photo.id;
+  }
 
   getImageUrl(photo: PhotoItem): string {
     if (this.isUnavailablePlaceholder(photo.url)) {
