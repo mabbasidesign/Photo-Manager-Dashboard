@@ -1,0 +1,36 @@
+<main class="auth-page">
+  <section class="auth-card">
+    <h1>Sign In</h1>
+    <p>Mock authentication flow for Angular practice.</p>
+
+    <form (ngSubmit)="onSubmit()" novalidate>
+      <label>
+        Username
+        <input
+          type="text"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="demo"
+          required
+        />
+      </label>
+
+      <label>
+        Password
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="demo123"
+          required
+        />
+      </label>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <small>Use credentials: <strong>demo</strong> / <strong>demo123</strong></small>
+    <a routerLink="/photos">Go to photos</a>
+  </section>
+</main>

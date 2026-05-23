@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.auth-page {
+  min-height: calc(100vh - 70px);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.62);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.34);
+  color: #e2e8f0;
+}
+
+h1 {
+  margin: 0;
+}
+
+p {
+  margin-top: 0.5rem;
+  color: #cbd5e1;
+}
+
+form {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.92rem;
+}
+
+input {
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 10px;
+  padding: 0.62rem 0.72rem;
+  font-size: 0.96rem;
+  background: rgba(15, 23, 42, 0.45);
+  color: #f8fafc;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  background: linear-gradient(120deg, #0ea5a4, #2563eb);
+}
+
+.error {
+  color: #fca5a5;
+  margin-bottom: 0;
+}
+
+small {
+  display: block;
+  margin-top: 0.4rem;
+  color: #cbd5e1;
+}
+
+a {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: #67e8f9;
+}

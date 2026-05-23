@@ -17,6 +17,7 @@
 	padding: 0.85rem 1rem;
 	display: flex;
 	gap: 0.5rem;
+	align-items: center;
 }
 
 .nav a {
@@ -40,6 +41,21 @@
 	color: #ffffff;
 	border-color: rgba(255, 255, 255, 0.3);
 	box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
+.logout-button {
+	margin-left: auto;
+	border: 1px solid rgba(252, 165, 165, 0.45);
+	background: rgba(127, 29, 29, 0.2);
+	color: #fee2e2;
+	font-weight: 600;
+	border-radius: 999px;
+	padding: 0.46rem 0.88rem;
+	cursor: pointer;
+}
+
+.logout-button:hover {
+	background: rgba(127, 29, 29, 0.34);
 }
 
 .loading-bar {

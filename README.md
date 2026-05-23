@@ -15,6 +15,7 @@ A simple Angular practice project that consumes a public test API (JSONPlacehold
 - Feature facade state management with RxJS (`BehaviorSubject` + `combineLatest`).
 - Search, sort, and pagination synchronized with URL query parameters.
 - Performance optimizations (`trackBy` + `OnPush` change detection).
+- Mock authentication flow with login, protected routes, token simulation, and logout.
 - Organize Angular code using a feature-based folder structure.
 
 ## Quick Start
@@ -60,11 +61,21 @@ angular-crud-practice/
 |  |  |  |  |- photo.model.ts
 |  |  |  |- interceptors/
 |  |  |  |  |- http-status.interceptor.ts
+|  |  |  |  |- mock-auth.interceptor.ts
+|  |  |  |- guards/
+|  |  |  |  |- auth.guard.ts
 |  |  |  |- services/
 |  |  |     |- photo-api.service.ts
 |  |  |     |- api-error.service.ts
 |  |  |     |- http-loading.service.ts
+|  |  |     |- auth.service.ts
 |  |  |- features/
+|  |  |  |- auth/
+|  |  |  |  |- pages/
+|  |  |  |     |- login-page/
+|  |  |  |        |- login-page.component.ts
+|  |  |  |        |- login-page.component.html
+|  |  |  |        |- login-page.component.css
 |  |  |  |- photos/
 |  |  |     |- data/
 |  |  |     |  |- photos-facade.service.ts
@@ -103,13 +114,24 @@ angular-crud-practice/
 
 ## App Routes
 
-- `/photos`: list mode.
+- `/login`: mock login page.
+- `/photos`: list mode (protected by auth guard).
 - `/photos/new`: create mode.
 - `/photos/:id/edit`: edit mode.
 
 `/` redirects to `/photos`.
 
 The photos feature routes are lazy-loaded from `src/app/features/photos/photos.routes.ts`.
+
+## Mock Auth Credentials
+
+- Username: `demo`
+- Password: `demo123`
+
+Notes:
+- This is a fake practice flow, not production security.
+- On successful login, a mock token is stored in `localStorage`.
+- Logout clears mock token/user state.
 
 ## List Controls
 
@@ -128,9 +150,19 @@ Holds TypeScript interfaces/types shared across features, such as `PhotoItem` an
 
 - `src/app/core/services`
 Holds API/data services. `photo-api.service.ts` centralizes all HTTP requests for the photos API.
+`auth.service.ts` handles mock login/logout and token state.
+
+- `src/app/core/guards`
+App-level route guards.
+`auth.guard.ts` protects photos routes and redirects unauthenticated users to `/login`.
 
 - `src/app/core/interceptors`
 Holds global HTTP interceptors. `http-status.interceptor.ts` manages request loading state and global API error mapping.
+`mock-auth.interceptor.ts` attaches a fake Bearer token when available.
+
+- `src/app/features/auth/pages`
+Authentication UI pages.
+`login-page` implements the mock sign-in flow and return URL redirect.
 
 - `src/app/features/photos/components`
 Reusable UI pieces for the photos feature:

@@ -1,11 +1,21 @@
 <header class="topbar">
 	<nav class="nav">
-		<a routerLink="/photos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+		<a
+			*ngIf="isAuthenticated()"
+			routerLink="/photos"
+			routerLinkActive="active"
+			[routerLinkActiveOptions]="{ exact: true }"
+		>
 			Photos
 		</a>
-		<a routerLink="/photos/new" routerLinkActive="active">
+		<a *ngIf="isAuthenticated()" routerLink="/photos/new" routerLinkActive="active">
 			New Photo
 		</a>
+		<a *ngIf="!isAuthenticated()" routerLink="/login" routerLinkActive="active">Login</a>
+
+		<button *ngIf="isAuthenticated()" type="button" class="logout-button" (click)="logout()">
+			Logout
+		</button>
 	</nav>
 
 	<div class="loading-bar" *ngIf="isLoading()">
