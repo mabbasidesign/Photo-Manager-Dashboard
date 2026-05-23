@@ -1,0 +1,30 @@
+<section class="panel list-panel">
+  <h2>Images</h2>
+
+  <p *ngIf="loading" class="muted">Loading images...</p>
+
+  <div class="image-grid" *ngIf="!loading">
+    <article class="image-card" *ngFor="let photo of photos">
+      <img [src]="photo.thumbnailUrl" [alt]="photo.title" loading="lazy" />
+
+      <div class="card-content">
+        <h3>{{ photo.title }}</h3>
+        <small>ID: {{ photo.id }}</small>
+
+        <div class="actions">
+          <button type="button" class="small" (click)="editPressed.emit(photo)">
+            Edit
+          </button>
+          <button
+            type="button"
+            class="small danger"
+            [disabled]="deletingId === photo.id"
+            (click)="deletePressed.emit(photo)"
+          >
+            {{ deletingId === photo.id ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

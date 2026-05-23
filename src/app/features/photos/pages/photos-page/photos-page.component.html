@@ -1,0 +1,29 @@
+<main class="page">
+  <header class="hero">
+    <h1>{{ title }}</h1>
+    <p>
+      Practice CRUD operations with JSONPlaceholder photos API.
+      Requests are successful but data is not permanently stored by the test API.
+    </p>
+  </header>
+
+  <app-photo-form
+    [form]="form"
+    [editingPhotoId]="editingPhotoId"
+    [saving]="saving"
+    [loading]="loading"
+    (submitPressed)="submitForm()"
+    (cancelPressed)="cancelEdit()"
+    (refreshPressed)="loadPhotos()"
+  />
+
+  <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
+
+  <app-photo-list
+    [photos]="photos"
+    [loading]="loading"
+    [deletingId]="deletingId"
+    (editPressed)="editPhoto($event)"
+    (deletePressed)="deletePhoto($event)"
+  />
+</main>

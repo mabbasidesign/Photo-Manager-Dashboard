@@ -1,0 +1,54 @@
+<section class="panel form-panel">
+  <h2>{{ editingPhotoId ? 'Update Image' : 'Create Image' }}</h2>
+
+  <form (ngSubmit)="submitPressed.emit()" class="crud-form">
+    <label>
+      Title
+      <input
+        type="text"
+        name="title"
+        [(ngModel)]="form.title"
+        placeholder="Type an image title"
+      />
+    </label>
+
+    <label>
+      Image URL
+      <input
+        type="url"
+        name="url"
+        [(ngModel)]="form.url"
+        placeholder="https://picsum.photos/id/10/600/400"
+      />
+    </label>
+
+    <label>
+      Thumbnail URL
+      <input
+        type="url"
+        name="thumbnailUrl"
+        [(ngModel)]="form.thumbnailUrl"
+        placeholder="https://picsum.photos/id/10/150/150"
+      />
+    </label>
+
+    <div class="actions">
+      <button type="submit" [disabled]="saving">
+        {{ saving ? 'Saving...' : editingPhotoId ? 'Update' : 'Create' }}
+      </button>
+
+      <button
+        type="button"
+        class="ghost"
+        *ngIf="editingPhotoId"
+        (click)="cancelPressed.emit()"
+      >
+        Cancel
+      </button>
+
+      <button type="button" class="ghost" (click)="refreshPressed.emit()" [disabled]="loading">
+        {{ loading ? 'Refreshing...' : 'Refresh List' }}
+      </button>
+    </div>
+  </form>
+</section>
