@@ -8,6 +8,9 @@ A simple Angular practice project that consumes a public test API (JSONPlacehold
 - Create a new image item.
 - Update an existing image item.
 - Delete an image item.
+- Route-based flows for list/create/edit.
+- Lazy-loaded feature routes.
+- CanDeactivate guard for unsaved form changes.
 - Organize Angular code using a feature-based folder structure.
 
 ## Quick Start
@@ -55,6 +58,9 @@ angular-crud-practice/
 |  |  |     |- photo-api.service.ts
 |  |  |- features/
 |  |  |  |- photos/
+|  |  |     |- guards/
+|  |  |     |  |- pending-changes.guard.ts
+|  |  |     |- photos.routes.ts
 |  |  |     |- components/
 |  |  |     |  |- photo-form/
 |  |  |     |  |  |- photo-form.component.ts
@@ -82,7 +88,18 @@ angular-crud-practice/
 |- tsconfig.json
 |- tsconfig.app.json
 |- tsconfig.spec.json
+|- angular-roadmap.txt
 ```
+
+## App Routes
+
+- `/photos`: list mode.
+- `/photos/new`: create mode.
+- `/photos/:id/edit`: edit mode.
+
+`/` redirects to `/photos`.
+
+The photos feature routes are lazy-loaded from `src/app/features/photos/photos.routes.ts`.
 
 ## Structure Explanation
 
@@ -101,8 +118,15 @@ Reusable UI pieces for the photos feature:
 Container pages for route-level screens.
 `photos-page` owns feature state and coordinates form + list components.
 
+- `src/app/features/photos/guards`
+Route guards for the photos feature.
+`pending-changes.guard.ts` prevents leaving create/edit routes when the form has unsaved changes.
+
+- `src/app/features/photos/photos.routes.ts`
+Feature routing module for photos with route mode data and guard wiring.
+
 - `src/app/app.routes.ts`
-Defines app routing and maps the default route to the photos page.
+Defines app-level routing, default redirect, and lazy loading for the photos feature.
 
 - `src/app/app.ts` and `src/app/app.html`
 Root shell of the application. Keeps root clean with `router-outlet` and delegates feature logic to routed pages.

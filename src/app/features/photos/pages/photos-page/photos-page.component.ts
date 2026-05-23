@@ -27,6 +27,11 @@ export class PhotosPageComponent implements OnInit {
     url: '',
     thumbnailUrl: ''
   };
+  private initialFormSnapshot: PhotoPayload = {
+    title: '',
+    url: '',
+    thumbnailUrl: ''
+  };
 
   constructor(
     private readonly photoApiService: PhotoApiService,
@@ -70,6 +75,14 @@ export class PhotosPageComponent implements OnInit {
 
   cancelEdit(): void {
     void this.router.navigate(['/photos']);
+  }
+
+  canDeactivate(): boolean {
+    if (!this.hasUnsavedChanges()) {
+      return true;
+    }
+
+    return window.confirm('You have unsaved changes. Leave this page anyway?');
   }
 
   submitForm(): void {
@@ -147,6 +160,7 @@ export class PhotosPageComponent implements OnInit {
       url: '',
       thumbnailUrl: ''
     };
+    this.initialFormSnapshot = { ...this.form };
   }
 
   private applyModeDefaults(): void {
@@ -182,6 +196,7 @@ export class PhotosPageComponent implements OnInit {
         url: localPhoto.url,
         thumbnailUrl: localPhoto.thumbnailUrl
       };
+      this.initialFormSnapshot = { ...this.form };
       this.feedback = `Editing image #${id}`;
       return;
     }
@@ -193,11 +208,28 @@ export class PhotosPageComponent implements OnInit {
           url: photo.url,
           thumbnailUrl: photo.thumbnailUrl
         };
+        this.initialFormSnapshot = { ...this.form };
         this.feedback = `Editing image #${id}`;
       },
       error: () => {
         this.feedback = `Unable to load image #${id} for editing.`;
       }
     });
+  }
+
+  private hasUnsavedChanges(): boolean {
+    if (this.mode === 'list') {
+      return false;
+    }
+
+    return !this.formsEqual(this.form, this.initialFormSnapshot);
+  }
+
+  private formsEqual(a: PhotoPayload, b: PhotoPayload): boolean {
+    return (
+      a.title === b.title &&
+      a.url === b.url &&
+      a.thumbnailUrl === b.thumbnailUrl
+    );
   }
 }
