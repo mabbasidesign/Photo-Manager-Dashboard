@@ -12,23 +12,25 @@
     <p class="mode-hint" *ngIf="mode === 'edit'">Route mode: /photos/:id/edit</p>
   </header>
 
-  <app-photo-form
-    [form]="form"
-    [editingPhotoId]="editingPhotoId"
-    [saving]="saving"
-    [loading]="loading"
-    (submitPressed)="submitForm()"
-    (cancelPressed)="cancelEdit()"
-    (refreshPressed)="loadPhotos()"
-  />
-
   <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
 
-  <app-photo-list
-    [photos]="photos"
-    [loading]="loading"
-    [deletingId]="deletingId"
-    (editPressed)="editPhoto($event)"
-    (deletePressed)="deletePhoto($event)"
-  />
+  <section class="workspace">
+    <app-photo-form
+      [form]="form"
+      [editingPhotoId]="editingPhotoId"
+      [saving]="saving"
+      [loading]="loading"
+      (submitPressed)="submitForm()"
+      (cancelPressed)="cancelEdit()"
+      (refreshPressed)="loadPhotos()"
+    />
+
+    <app-photo-list
+      [photos]="photos"
+      [loading]="loading"
+      [deletingId]="deletingId"
+      (editPressed)="editPhoto($event)"
+      (deletePressed)="deletePhoto($event)"
+    />
+  </section>
 </main>

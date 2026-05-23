@@ -91,6 +91,11 @@ export class PhotosPageComponent implements OnInit {
       return;
     }
 
+    if (!this.isValidUrl(this.form.url) || !this.isValidUrl(this.form.thumbnailUrl)) {
+      this.feedback = 'Please enter valid URLs for Image URL and Thumbnail URL.';
+      return;
+    }
+
     this.saving = true;
     this.feedback = '';
 
@@ -231,5 +236,14 @@ export class PhotosPageComponent implements OnInit {
       a.url === b.url &&
       a.thumbnailUrl === b.thumbnailUrl
     );
+  }
+
+  private isValidUrl(value: string): boolean {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 }

@@ -5,7 +5,12 @@
 
   <div class="image-grid" *ngIf="!loading">
     <article class="image-card" *ngFor="let photo of photos">
-      <img [src]="photo.thumbnailUrl" [alt]="photo.title" loading="lazy" />
+      <img
+        [src]="getImageUrl(photo)"
+        [alt]="photo.title"
+        loading="lazy"
+        (error)="handleImageError($event, photo)"
+      />
 
       <div class="card-content">
         <h3>{{ photo.title }}</h3>

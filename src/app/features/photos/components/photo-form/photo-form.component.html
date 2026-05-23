@@ -1,7 +1,7 @@
 <section class="panel form-panel">
   <h2>{{ editingPhotoId ? 'Update Image' : 'Create Image' }}</h2>
 
-  <form (ngSubmit)="submitPressed.emit()" class="crud-form">
+  <form (ngSubmit)="submitPressed.emit()" class="crud-form" novalidate>
     <label>
       Title
       <input

@@ -15,4 +15,32 @@ export class PhotoListComponent {
 
   @Output() editPressed = new EventEmitter<PhotoItem>();
   @Output() deletePressed = new EventEmitter<PhotoItem>();
+
+  getImageUrl(photo: PhotoItem): string {
+    if (this.isUnavailablePlaceholder(photo.url)) {
+      return this.getFallbackImageUrl(photo.id);
+    }
+
+    return photo.url;
+  }
+
+  handleImageError(event: Event, photo: PhotoItem): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image) {
+      return;
+    }
+
+    const fallback = this.getFallbackImageUrl(photo.id);
+    if (image.src !== fallback) {
+      image.src = fallback;
+    }
+  }
+
+  private isUnavailablePlaceholder(url: string): boolean {
+    return url.includes('via.placeholder.com');
+  }
+
+  private getFallbackImageUrl(id: number): string {
+    return `https://picsum.photos/seed/photo-${id}/240/240`;
+  }
 }
